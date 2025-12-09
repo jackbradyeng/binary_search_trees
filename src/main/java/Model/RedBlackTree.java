@@ -9,7 +9,7 @@ import java.awt.*;
  * 2. Every red node must have a black parent and black child.
  * 3. The number of black nodes in each subtree must be equal.
  */
-public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> implements Tree<T> {
+public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
     private Node<T> root;
 
@@ -37,15 +37,31 @@ public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> i
     }
 
     @Override
-    public void delete(T data) {
+    public void delete(T data) { root = delete(data, root); }
 
-    }
-
-    private Node<T> delete(Node<T> node, Node<T> nodeToDelete) {
+    private Node<T> delete(T data, Node<T> node) {
         if(node == null) {
-            return nodeToDelete;
+            return null;
         }
-        //implement full deletion logic
+        //traverse the LHS of the tree
+        if(data.compareTo(node.getData()) < 1) {
+            node.setLeftChild(delete(data, node.getLeftChild()));
+        }
+        //traverse the RHS of the tree
+        else if(data.compareTo(node.getData()) > 1) {
+            node.setRightChild(delete(data, node.getRightChild()));
+        } else {
+            //when a match is found
+            if(node.getLeftChild() == null) {
+                return node.getRightChild();
+            } else if(node.getRightChild() == null) {
+                return node.getLeftChild();
+            }
+            node.setData(getMax(node.getLeftChild()));
+            node.setLeftChild(delete(node.getData(), node.getLeftChild()));
+        }
+        recolorAndRotate(node);
+        updateHeight(node);
         return node;
     }
 
